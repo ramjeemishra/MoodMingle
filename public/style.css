@@ -1,0 +1,114 @@
+/* Add this section to style the selected mood display */
+#selected-mood {
+    margin-top: -10px;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+    color: #5151E5;
+}
+
+/* Rest of the CSS remains the same */
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #72EDF2 10%, #5151E5 100%);
+    color: #333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 5px;
+    color: #5151E5;
+}
+
+#mood-selection {
+    margin-bottom: 20px;
+}
+
+#mood-selection button {
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    background-color: #5151E5;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#mood-selection button:hover {
+    background-color: #72EDF2;
+}
+
+.form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.form input[type="text"] {
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    margin-right: 10px;
+    width: calc(100% - 100px);
+    box-sizing: border-box;
+}
+
+.form button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #5151E5;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.form button:hover {
+    background-color: #72EDF2;
+}
+
+.messages {
+    list-style: none;
+    padding: 0;
+    max-height: 300px;
+    overflow-y: auto;
+    margin: 0;
+    border-top: 1px solid #ddd;
+    padding-top: 20px;
+}
+
+.message {
+    margin-bottom: 15px;
+}
+
+.message strong {
+    color: #5151E5;
+}
+
+@media (max-width: 600px) {
+    .form input[type="text"] {
+        width: calc(100% - 90px);
+    }
+
+    .form button {
+        width: 80px;
+        padding: 10px;
+    }
+}

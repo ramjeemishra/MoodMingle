@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MoodMingle</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="logo1.png" type="image/x-icon">
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const socket = io();
+
+            const username = prompt('Enter your username:');
+            socket.emit('set username', username);
+
+            const moodForm = document.getElementById('mood-form');
+            const messageForm = document.getElementById('message-form');
+            const messages = document.getElementById('messages');
+            const customMoodButton = document.getElementById('custom-mood-button');
+            const customMoodInput = document.getElementById('custom-mood-input');
+            const predefinedMoods = document.querySelectorAll('.predefined-mood');
+            const selectedMoodDisplay = document.getElementById('selected-mood');
+
+            let matchedGroup = null;
+
+            predefinedMoods.forEach(button => {
+                button.addEventListener('click', () => {
+                    const mood = button.innerText;
+                    socket.emit('enter mood', mood);
+                    selectedMoodDisplay.innerText = `Your selected mood is: ${mood}`;
+                });
+            });
+
+            customMoodButton.addEventListener('click', () => {
+                customMoodInput.style.display = 'block';
+            });
+
+            moodForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const mood = customMoodInput.value;
+                socket.emit('enter mood', mood);
+                selectedMoodDisplay.innerText = `Your selected mood is: ${mood}`;
+            });
+
+            socket.on('matched', ({ group }) => {
+                matchedGroup = group;
+                alert('Matched in group: ' + group);
+            });
+
+            messageForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const message = document.getElementById('message').value;
+                if (matchedGroup) {
+                    socket.emit('send message', { message });
+                    messages.innerHTML += `<li class="message"><strong>You:</strong> ${message}</li>`;
+                }
+            });
+
+            socket.on('receive message', ({ from, message }) => {
+                messages.innerHTML += `<li class="message"><strong>${from}:</strong> ${message}</li>`;
+            });
+
+            socket.on('user left', () => {
+                alert('Your chat partner has left.');
+                matchedGroup = null;
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>MoodMingle</h1>
+        <p id="selected-mood"></p> <!-- Placeholder for selected mood -->
+        <div id="mood-selection">
+            <button class="predefined-mood">Happy</button>
+            <button class="predefined-mood">Sad</button>
+            <button class="predefined-mood">Angry</button>
+            <button class="predefined-mood">Excited</button>
+            <button class="predefined-mood">Anxious</button>
+            <button id="custom-mood-button">Create Room</button>
+        </div>
+        <form id="mood-form" class="form">
+            <input type="text" id="custom-mood-input" placeholder="Password here {strong}" required style="display:none;">
+            <p required style="display:none;" id="custom-mood-input">"Create a Password" or "Enter a Password to join room"</p>
+            <button type="submit">Submit</button>
+        </form>
+        <form id="message-form" class="form">
+            <input type="text" id="message" placeholder="Enter your message" required>
+            <button type="submit">Send</button>
+        </form>
+        <ul id="messages" class="messages"></ul>
+    </div>
+</body>
+</html>
