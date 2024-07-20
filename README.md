@@ -25,7 +25,7 @@
       <li><strong>Responsive Design:</strong> The app is designed to be responsive and user-friendly across various devices.</li>
     </ul>
     <h3>Screenshots</h3>
-    <img src="https://github.com/yourusername/MoodMingle/blob/main/assets/screenshot.png" alt="MoodMingle Screenshot" style="width:100%; max-width:600px;">
+    <img src="https://github.com/ramjeemishra/MoodMingle/blob/master/Screenshot%202024-07-20%20210845.png" alt="MoodMingle Screenshot" style="width:100%; max-width:600px;">
     <h3>Live Demo</h3>
     <p>Check out the live demo <a href="https://moodmingle-yfr5.onrender.com">open site</a>.</p>
     <h3>Usage</h3>
