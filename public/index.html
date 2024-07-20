@@ -23,14 +23,25 @@
             const selectedMoodDisplay = document.getElementById('selected-mood');
             const totalUsersDisplay = document.getElementById('total-users');
             const moodCountsDisplay = document.getElementById('mood-counts');
+            const moodStatsDisplay = document.getElementById('mood-stats');
 
             let matchedGroup = null;
+            let currentMood = null;
 
             predefinedMoods.forEach(button => {
                 button.addEventListener('click', () => {
                     const mood = button.innerText;
-                    socket.emit('enter mood', mood);
-                    selectedMoodDisplay.innerText = `Your selected mood is: ${mood}`;
+                    if (mood === currentMood) {
+                        alert(`You are already in the mood: ${mood}.`);
+                    } else {
+                        if (currentMood) {
+                            alert(`You have selected a mood before: ${currentMood}. Please clear your previous mood first.`);
+                        } else {
+                            socket.emit('enter mood', mood);
+                            currentMood = mood;
+                            selectedMoodDisplay.innerText = `Your selected mood is: ${mood}`;
+                        }
+                    }
                 });
             });
 
@@ -40,9 +51,18 @@
 
             moodForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                const mood = customMoodInput.value;
-                socket.emit('enter mood', mood);
-                selectedMoodDisplay.innerText = `Your selected mood is: ${mood}`;
+                const mood = "Private";
+                if (mood === currentMood) {
+                    alert(`You are already in the mood: ${mood}.`);
+                } else {
+                    if (currentMood) {
+                        alert(`You have selected a mood before: ${currentMood}. Please clear your previous mood first.`);
+                    } else {
+                        socket.emit('enter mood', mood);
+                        currentMood = mood;
+                        selectedMoodDisplay.innerText = `Your selected mood is: ${mood}`;
+                    }
+                }
             });
 
             socket.on('matched', ({ group }) => {
@@ -59,8 +79,8 @@
                     const newMessageElement = document.createElement('li');
                     newMessageElement.classList.add('message');
                     newMessageElement.innerHTML = `<strong>You:</strong> ${message}`;
-                    messages.insertBefore(newMessageElement, messages.firstChild); // Prepend the new message
-                    messageInput.value = ''; // Clear the input field after sending the message
+                    messages.insertBefore(newMessageElement, messages.firstChild);
+                    messageInput.value = '';
                 }
             });
 
@@ -68,21 +88,23 @@
                 const newMessageElement = document.createElement('li');
                 newMessageElement.classList.add('message');
                 newMessageElement.innerHTML = `<strong>${from}:</strong> ${message}`;
-                messages.insertBefore(newMessageElement, messages.firstChild); // Prepend the new message
+                messages.insertBefore(newMessageElement, messages.firstChild);
             });
 
             socket.on('user counts', ({ totalUsers, moodCounts }) => {
                 totalUsersDisplay.innerText = `Total users: ${totalUsers}`;
-                let moodCountsText = 'Users by mood:';
+                moodStatsDisplay.innerHTML = ''; // Clear previous data
                 for (const mood in moodCounts) {
-                    moodCountsText += ` ${mood}: ${moodCounts[mood]}`;
+                    const moodElement = document.createElement('p');
+                    moodElement.innerText = `${mood} users: ${moodCounts[mood]}`;
+                    moodStatsDisplay.appendChild(moodElement);
                 }
-                moodCountsDisplay.innerText = moodCountsText;
             });
 
             socket.on('user left', () => {
                 alert('Your chat partner has left.');
                 matchedGroup = null;
+                selectedMoodDisplay.innerText = 'You are not currently in a chat.';
             });
         });
     </script>
@@ -94,6 +116,9 @@
         <p id="selected-mood"></p> <!-- Placeholder for selected mood -->
         <p id="total-users"></p> <!-- Placeholder for total users -->
         <p id="mood-counts"></p> <!-- Placeholder for mood counts -->
+        <div id="mood-stats">
+            <h2>Users by Mood</h2>
+        </div>
         <div id="mood-selection">
             <button class="predefined-mood">Happy</button>
             <button class="predefined-mood">Sad</button>
@@ -103,8 +128,7 @@
             <button id="custom-mood-button">Create Room</button>
         </div>
         <form id="mood-form" class="form">
-            <input type="text" id="custom-mood-input" placeholder="Password here {strong}" required
-                style="display:none;">
+            <input type="text" id="custom-mood-input" placeholder="Password here {strong}" required>
             <button type="submit">Submit</button>
         </form>
         <form id="message-form" class="form">

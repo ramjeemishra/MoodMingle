@@ -101,7 +101,12 @@ h1 {
 .message strong {
     color: #5151E5;
 }
-
+#mood-stats{
+    overflow-y: scroll;
+    height: 70px;
+    background: aliceblue;
+    border: 5px;
+}
 @media (max-width: 600px) {
     .form input[type="text"] {
         width: calc(100% - 90px);
@@ -111,4 +116,10 @@ h1 {
         width: 80px;
         padding: 10px;
     }
+}
+
+
+
+#custom-mood-input{
+    display: none;
 }
