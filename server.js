@@ -11,12 +11,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const users = {};
 const moodGroups = {};
+const moodCounts = {};
 
 io.on('connection', (socket) => {
     console.log('New user connected:', socket.id);
 
     socket.on('set username', (username) => {
         users[socket.id] = { username, mood: null, chatGroup: null };
+        updateCounts();
     });
 
     socket.on('enter mood', (mood) => {
@@ -41,6 +43,12 @@ io.on('connection', (socket) => {
                 moodGroups[mood].push([socket.id]);
                 users[socket.id].chatGroup = moodGroups[mood][moodGroups[mood].length - 1];
             }
+
+            if (!moodCounts[mood]) {
+                moodCounts[mood] = 0;
+            }
+            moodCounts[mood]++;
+            updateCounts();
         }
     });
 
@@ -70,8 +78,20 @@ io.on('connection', (socket) => {
                 }
             }
         }
+        if (moodCounts[mood]) {
+            moodCounts[mood]--;
+            if (moodCounts[mood] === 0) {
+                delete moodCounts[mood];
+            }
+        }
         delete users[socket.id];
+        updateCounts();
     });
+
+    function updateCounts() {
+        const totalUsers = Object.keys(users).length;
+        io.emit('user counts', { totalUsers, moodCounts });
+    }
 });
 
 const PORT = process.env.PORT || 3000;

@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MoodMingle</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="shortcut icon" href="logo1.png" type="image/x-icon">
     <script src="/socket.io/socket.io.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -20,6 +21,8 @@
             const customMoodInput = document.getElementById('custom-mood-input');
             const predefinedMoods = document.querySelectorAll('.predefined-mood');
             const selectedMoodDisplay = document.getElementById('selected-mood');
+            const totalUsersDisplay = document.getElementById('total-users');
+            const moodCountsDisplay = document.getElementById('mood-counts');
 
             let matchedGroup = null;
 
@@ -49,15 +52,32 @@
 
             messageForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                const message = document.getElementById('message').value;
+                const messageInput = document.getElementById('message');
+                const message = messageInput.value;
                 if (matchedGroup) {
                     socket.emit('send message', { message });
-                    messages.innerHTML += `<li class="message"><strong>You:</strong> ${message}</li>`;
+                    const newMessageElement = document.createElement('li');
+                    newMessageElement.classList.add('message');
+                    newMessageElement.innerHTML = `<strong>You:</strong> ${message}`;
+                    messages.insertBefore(newMessageElement, messages.firstChild); // Prepend the new message
+                    messageInput.value = ''; // Clear the input field after sending the message
                 }
             });
 
             socket.on('receive message', ({ from, message }) => {
-                messages.innerHTML += `<li class="message"><strong>${from}:</strong> ${message}</li>`;
+                const newMessageElement = document.createElement('li');
+                newMessageElement.classList.add('message');
+                newMessageElement.innerHTML = `<strong>${from}:</strong> ${message}`;
+                messages.insertBefore(newMessageElement, messages.firstChild); // Prepend the new message
+            });
+
+            socket.on('user counts', ({ totalUsers, moodCounts }) => {
+                totalUsersDisplay.innerText = `Total users: ${totalUsers}`;
+                let moodCountsText = 'Users by mood:';
+                for (const mood in moodCounts) {
+                    moodCountsText += ` ${mood}: ${moodCounts[mood]}`;
+                }
+                moodCountsDisplay.innerText = moodCountsText;
             });
 
             socket.on('user left', () => {
@@ -67,10 +87,13 @@
         });
     </script>
 </head>
+
 <body>
     <div class="container">
         <h1>MoodMingle</h1>
         <p id="selected-mood"></p> <!-- Placeholder for selected mood -->
+        <p id="total-users"></p> <!-- Placeholder for total users -->
+        <p id="mood-counts"></p> <!-- Placeholder for mood counts -->
         <div id="mood-selection">
             <button class="predefined-mood">Happy</button>
             <button class="predefined-mood">Sad</button>
@@ -80,8 +103,8 @@
             <button id="custom-mood-button">Create Room</button>
         </div>
         <form id="mood-form" class="form">
-            <input type="text" id="custom-mood-input" placeholder="Password here {strong}" required style="display:none;">
-            <p required style="display:none;" id="custom-mood-input">"Create a Password" or "Enter a Password to join room"</p>
+            <input type="text" id="custom-mood-input" placeholder="Password here {strong}" required
+                style="display:none;">
             <button type="submit">Submit</button>
         </form>
         <form id="message-form" class="form">
@@ -91,4 +114,5 @@
         <ul id="messages" class="messages"></ul>
     </div>
 </body>
+
 </html>
