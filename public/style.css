@@ -123,3 +123,19 @@ h1 {
 #custom-mood-input{
     display: none;
 }
+.made-with-love {
+    text-align: center;
+    position: fixed;
+    margin-bottom: 90dvh;
+}
+i {
+    font-style: italic;
+}
+.made-with-love a {
+    color: rgb(255, 255, 255);
+    letter-spacing: 0.15em;
+    display: inline-block;
+    position: relative;
+    text-decoration: none;
+    padding: 4px;
+}
